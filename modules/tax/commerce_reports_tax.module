@@ -297,7 +297,7 @@ function commerce_reports_tax_order_save($order) {
 
         // Increase the amounts.
         $applied_taxes[$id]->taxable += $taxable['amount'];
-        $applied_taxes[$id]->taxed += $taxed['amount'];
+        $applied_taxes[$id]->taxed += round($taxed['amount']);
       }
     }
     else {

@@ -80,3 +80,10 @@ function commerce_reports_tax_update_7300(&$sandbox) {
   // Install the new database schema.
   drupal_install_schema('commerce_reports_tax');
 }
+
+/**
+ * Recommendation that users regenerate all tax information.
+ */
+function commerce_reports_tax_update_7401(&$sandbox) {
+  drupal_set_message(t('This Commerce Tax Reporting update fixed a bug that sometimes rounded cents incorrectly in tax reports. It is highly recommended that you manually <a href="/admin/commerce/config/tax-reports">regenerate all tax information</a>.'), 'warning');
+}
