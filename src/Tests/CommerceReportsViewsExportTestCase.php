@@ -15,7 +15,6 @@ class CommerceReportsViewsExportTestCase extends CommerceReportsBaseTestCase {
     );
   }
 
-
   function setUp() {
     $this->resetAll();
     $this->additional_modules[] = 'views_data_export';
@@ -85,12 +84,13 @@ class CommerceReportsViewsExportTestCase extends CommerceReportsBaseTestCase {
     $this->createCustomers(5);
     $this->createOrders(20, FALSE, $this->sampleDates());
 
-
     // Monthly
     $rendered = $this->getRenderedExport('commerce_reports_sales');
+
     $this->assertCsvHeaders('"Created date","Number of Orders","Total Revenue","Average Order"', $rendered[0]);
 
     $months = $this->ordersGroupedByTime('F Y');
+
     array_shift($rendered);
     $this->assertEqual(count($rendered), count($months), t('The amount of months (%reported) that is reported (%generated) upon is correct.', array('%reported' => count($rendered), '%generated' => count($months))));
 
@@ -128,9 +128,8 @@ class CommerceReportsViewsExportTestCase extends CommerceReportsBaseTestCase {
 
     // Date info
     $start = new \DateTime();
-    $end = clone $start;
-
     $start->setTimestamp($dates[0]);
+    $end = clone $start;
     $end = $end->add(new \DateInterval('P1M'));
 
     // Setup our view
@@ -176,10 +175,15 @@ class CommerceReportsViewsExportTestCase extends CommerceReportsBaseTestCase {
 
   protected function sampleDates() {
     $sample = array();
-    for ($i = 0; $i < rand(0, 20); $i++) {
-      $date = new \DateTime();
-      $sample[] = $date->sub(new \DateInterval("P{$i}M"))->getTimestamp();
+    $date = new \DateTime();
+    $max_date = $date->getTimestamp();
+    $min_date = $date->sub(new \DateInterval("P12M"))->getTimestamp();
+
+    for ($i = 0; $i < 20; $i++) {
+      $random_date = rand($max_date, $min_date);
+      $sample[] = $random_date;
     }
     return $sample;
   }
+
 }
