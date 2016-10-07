@@ -214,6 +214,8 @@ function _commerce_reports_views_default_products_views() {
   $handler->display->display_options['pager']['options']['offset'] = '0';
   $handler->display->display_options['defaults']['style_plugin'] = FALSE;
   $handler->display->display_options['style_plugin'] = 'chart';
+  $handler->display->display_options['style_options']['xaxis_title'] = 'Sold';
+  $handler->display->display_options['style_options']['yaxis_title'] = 'Revenue';
   $handler->display->display_options['style_options']['type'] = 'bar';
   $handler->display->display_options['style_options']['library'] = 'google';
   $handler->display->display_options['style_options']['label_field'] = 'title';
@@ -297,6 +299,8 @@ function _commerce_reports_views_default_products_views() {
   $handler->display->display_options['style_plugin'] = 'chart';
   $handler->display->display_options['style_options']['type'] = 'bar';
   $handler->display->display_options['style_options']['library'] = 'google';
+  $handler->display->display_options['style_options']['legend_position'] = 'bottom';
+  $handler->display->display_options['style_options']['yaxis_title'] = 'Sold';
   $handler->display->display_options['style_options']['label_field'] = 'title';
   $handler->display->display_options['style_options']['data_fields'] = array(
     'title' => 'title',
