@@ -66,7 +66,7 @@ function commerce_reports_tax_views_default_views() {
   $handler->display->display_options['filters']['state']['table'] = 'commerce_order';
   $handler->display->display_options['filters']['state']['field'] = 'state';
   $handler->display->display_options['filters']['state']['relationship'] = 'order_id';
-  $handler->display->display_options['filters']['state']['value'] = commerce_reports_reportable_order_states();
+  $handler->display->display_options['filters']['state']['value'] = commerce_reports_tax_reportable_order_states();
   $handler->display->display_options['filters']['state']['exposed'] = TRUE;
   $handler->display->display_options['filters']['state']['expose']['operator_id'] = 'state_op';
   $handler->display->display_options['filters']['state']['expose']['label'] = 'Order status';

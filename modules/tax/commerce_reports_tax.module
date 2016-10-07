@@ -346,3 +346,36 @@ function _commerce_reports_tax_get_tax_rates(EntityDrupalWrapper $line_item_wrap
   }
   return $tax_rates;
 }
+
+/**
+ * Returns the order states to report on.
+ *
+ * @return array
+ *    Array of order states for Views to filter on.
+ */
+function commerce_reports_tax_reportable_order_states(){
+  if(function_exists('commerce_reports_reportable_order_states')) {
+    return commerce_reports_reportable_order_states();
+  }
+  $cache =& drupal_static(__FUNCTION__, array());
+
+  if (empty($cache)) {
+    $report_states = array(
+      'pending',
+      'completed',
+    );
+
+    // Validate states.
+    $order_states = commerce_order_states();
+    foreach ($report_states as $state) {
+      if (!in_array($state, $order_states)) {
+        unset($report_states[$state]);
+      }
+    }
+
+    // Use array_combine to match View's 'value' => 'value',
+    $cache = array_combine($report_states, $report_states);
+  }
+
+  return $cache;
+}
