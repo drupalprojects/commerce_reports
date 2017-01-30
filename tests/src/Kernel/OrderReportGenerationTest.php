@@ -12,6 +12,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * Test order report generation.
+ *
+ * @group commerce_reports
+ */
 class OrderReportGenerationTest extends CommerceKernelTestBase {
 
   /**
@@ -42,6 +47,9 @@ class OrderReportGenerationTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order_report');
   }
 
+  /**
+   * Tests that order reports are generated when an order is placed.
+   */
   public function testOrderReportGeneration() {
     $variation = ProductVariation::create([
       'type' => 'default',
@@ -86,4 +94,5 @@ class OrderReportGenerationTest extends CommerceKernelTestBase {
     $this->assertEquals($order_report->getOrderId(), $order->id());
     $this->assertEquals($order_report->getAmount(), $order->getTotalPrice());
   }
+
 }

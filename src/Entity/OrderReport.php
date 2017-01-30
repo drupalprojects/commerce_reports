@@ -43,6 +43,9 @@ use Drupal\Core\Field\BaseFieldDefinition;
  */
 class OrderReport extends ContentEntityBase implements OrderReportInterface {
 
+  /**
+   * {@inheritdoc}
+   */
   public function label() {
     if (!$this->isNew()) {
       return t('Order report for @order_number', ['@order_number' => $this->getOrder()->getOrderNumber()]);
@@ -97,7 +100,6 @@ class OrderReport extends ContentEntityBase implements OrderReportInterface {
       return $this->get('shipping_amount')->first()->toPrice();
     }
   }
-
 
   /**
    * {@inheritdoc}

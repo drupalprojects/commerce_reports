@@ -9,6 +9,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * Event subscriber to order placed transition event.
+ */
 class OrderPlacedEventSubscriber implements EventSubscriberInterface {
 
   /**
@@ -75,7 +78,7 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
       $order_report = $this->orderReportStorage->create([
         'order_id' => $order->id(),
         'amount' => $order->getTotalPrice(),
-        'created' => $order->getPlacedTime()
+        'created' => $order->getPlacedTime(),
       ]);
       // @todo decide on how to allow others to add additional field data.
       $order_report->save();

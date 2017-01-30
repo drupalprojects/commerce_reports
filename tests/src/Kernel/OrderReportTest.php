@@ -37,6 +37,9 @@ class OrderReportTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order_report');
   }
 
+  /**
+   * Tests order report entity.
+   */
   public function testOrderReport() {
     $order = Order::create([
       'type' => 'default',

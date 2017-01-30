@@ -5,7 +5,14 @@ namespace Drupal\commerce_reports;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
 
+/**
+ * Builds a listing of the order report entities.
+ */
 class OrderReportsListBuilder extends EntityListBuilder {
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildHeader() {
     $header['label'] = $this->t('Label');
     $header['amount'] = $this->t('Amount');
@@ -14,6 +21,9 @@ class OrderReportsListBuilder extends EntityListBuilder {
     return parent::buildHeader() + $header;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildRow(EntityInterface $entity) {
     /** @var \Drupal\commerce_reports\Entity\OrderReportInterface $entity */
     $row['title']['data'] = [
@@ -25,24 +35,23 @@ class OrderReportsListBuilder extends EntityListBuilder {
       '#template' => '{{ amount|commerce_price_format }}',
       '#context' => [
         'amount' => $entity->getAmount(),
-      ]
+      ],
     ];
     $row['tax_amount']['data'] = [
       '#type' => 'inline_template',
       '#template' => '{{ amount|commerce_price_format }}',
       '#context' => [
         'amount' => $entity->getTaxAmount(),
-      ]
+      ],
     ];
     $row['shipping_amount']['data'] = [
       '#type' => 'inline_template',
       '#template' => '{{ amount|commerce_price_format }}',
       '#context' => [
         'amount' => $entity->getShippingAmount(),
-      ]
+      ],
     ];
     return $row + parent::buildRow($entity);
   }
-
 
 }

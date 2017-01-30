@@ -4,6 +4,9 @@ namespace Drupal\commerce_reports\Entity;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 
+/**
+ * Defines the interface for order reports.
+ */
 interface OrderReportInterface extends ContentEntityInterface {
 
   /**
@@ -56,4 +59,5 @@ interface OrderReportInterface extends ContentEntityInterface {
    *   Creation timestamp of the order report.
    */
   public function getCreatedTime();
+
 }
