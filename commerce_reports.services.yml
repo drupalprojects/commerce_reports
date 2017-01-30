@@ -1,0 +1,6 @@
+services:
+  commerce_reports.order_placed_subscriber:
+    class: Drupal\commerce_reports\EventSubscriber\OrderPlacedEventSubscriber
+    arguments: ['@entity_type.manager', '@state']
+    tags:
+      - { name: event_subscriber }
