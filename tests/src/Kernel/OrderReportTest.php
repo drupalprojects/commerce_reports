@@ -46,7 +46,7 @@ class OrderReportTest extends CommerceKernelTestBase {
       'state' => 'completed',
     ]);
     $order->save();
-    $time = $this->container->get('commerce.time')->getCurrentTime();
+    $time = $this->container->get('datetime.time')->getCurrentTime();
     $order_report = OrderReport::create([
       'order_id' => $order->id(),
       'amount' => new Price('1.00', 'USD'),
