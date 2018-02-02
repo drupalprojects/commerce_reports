@@ -18,7 +18,7 @@ class ReportsListBuilder extends EntityListBuilder {
     $header['amount'] = $this->t('Amount');
     $header['tax_amount'] = $this->t('Tax amount');
     $header['shipping_amount'] = $this->t('Shipping amount');
-    return parent::buildHeader() + $header;
+    return $header + parent::buildHeader();
   }
 
   /**
