@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_reports\EventSubscriber;
 
+use Drupal\commerce_reports\Plugin\Commerce\ReportType\OrderReportTypeInterface;
+use Drupal\commerce_reports\ReportTypeManager;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
@@ -13,13 +15,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * Event subscriber to order placed transition event.
  */
 class OrderPlacedEventSubscriber implements EventSubscriberInterface {
-
-  /**
-   * The order report storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $orderReportStorage;
 
   /**
    * The order storage.
@@ -36,17 +31,24 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
   protected $state;
 
   /**
+   * @var \Drupal\commerce_payment\OrderReportTypeManager
+   */
+  protected $orderReportTypeManager;
+
+  /**
    * Constructs a new OrderPlacedEventSubscriber object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key/value store.
+   * @param \Drupal\commerce_payment\OrderReportTypeManager
+   *   The order report type manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, StateInterface $state) {
-    $this->orderReportStorage = $entity_type_manager->getStorage('commerce_order_report');
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, StateInterface $state, ReportTypeManager $orderReportTypeManager) {
     $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
     $this->state = $state;
+    $this->orderReportTypeManager = $orderReportTypeManager;
   }
 
   /**
@@ -57,7 +59,6 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
    */
   public function flagOrder(WorkflowTransitionEvent $event) {
     $order = $event->getEntity();
-
     $existing = $this->state->get('commerce_order_reports', []);
     $existing[] = $order->id();
     $this->state->set('commerce_order_reports', $existing);
@@ -72,16 +73,14 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
   public function generateReports(PostResponseEvent $event) {
     $order_ids = $this->state->get('commerce_order_reports', []);
     $orders = $this->orderStorage->loadMultiple($order_ids);
-
+    /** @var OrderReportTypeInterface[] $plugin_types */
+    $plugin_types = $this->orderReportTypeManager->getDefinitions();
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     foreach ($orders as $order) {
-      $order_report = $this->orderReportStorage->create([
-        'order_id' => $order->id(),
-        'amount' => $order->getTotalPrice(),
-        'created' => $order->getPlacedTime(),
-      ]);
-      // @todo decide on how to allow others to add additional field data.
-      $order_report->save();
+      foreach ($plugin_types as $plugin_type) {
+        $instance = $this->orderReportTypeManager->createInstance($plugin_type['id'], []);
+        $instance->generateReport($order);
+      }
     }
 
     $this->state->set('commerce_order_reports', []);

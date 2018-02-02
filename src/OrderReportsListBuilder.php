@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityListBuilder;
 /**
  * Builds a listing of the order report entities.
  */
-class OrderReportsListBuilder extends EntityListBuilder {
+class ReportsListBuilder extends EntityListBuilder {
 
   /**
    * {@inheritdoc}

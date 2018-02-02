@@ -1,6 +1,10 @@
 services:
   commerce_reports.order_placed_subscriber:
     class: Drupal\commerce_reports\EventSubscriber\OrderPlacedEventSubscriber
-    arguments: ['@entity_type.manager', '@state']
+    arguments: ['@entity_type.manager', '@state', '@plugin.manager.commerce_report_type']
     tags:
       - { name: event_subscriber }
+
+  plugin.manager.commerce_report_type:
+      class: Drupal\commerce_reports\ReportTypeManager
+      parent: default_plugin_manager

@@ -2,6 +2,9 @@
 
 namespace Drupal\commerce_reports\Entity;
 
+use Drupal\Core\Annotation\PluralTranslation;
+use Drupal\Core\Annotation\Translation;
+use Drupal\Core\Entity\Annotation\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -18,10 +21,12 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     singular = "@count order report",
  *     plural = "@count order reports",
  *   ),
+ *   bundle_label = @Translation("Order report type"),
+ *   bundle_plugin_type = "commerce_report_type",
  *   handlers = {
  *     "access" = "Drupal\commerce\EntityAccessControlHandler",
  *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
- *     "list_builder" = "Drupal\commerce_reports\OrderReportsListBuilder",
+ *     "list_builder" = "Drupal\commerce_reports\ReportsListBuilder",
  *     "storage" = "Drupal\Core\Entity\Sql\SqlContentEntityStorage",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "route_provider" = {
@@ -33,6 +38,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "report_id",
+ *     "bundle" = "type",
  *     "uuid" = "uuid",
  *   },
  *   links = {
@@ -77,59 +83,16 @@ class OrderReport extends ContentEntityBase implements OrderReportInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAmount() {
-    if (!$this->get('amount')->isEmpty()) {
-      return $this->get('amount')->first()->toPrice();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getTaxAmount() {
-    if (!$this->get('tax_amount')->isEmpty()) {
-      return $this->get('tax_amount')->first()->toPrice();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getShippingAmount() {
-    if (!$this->get('shipping_amount')->isEmpty()) {
-      return $this->get('shipping_amount')->first()->toPrice();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
-    $fields['order_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Order'))
-      ->setDescription(t('The parent order.'))
-      ->setSetting('target_type', 'commerce_order')
-      ->setReadOnly(TRUE);
-    $fields['amount'] = BaseFieldDefinition::create('commerce_price')
-      ->setLabel(t('Amount'))
-      ->setDescription(t('The order total amount.'))
-      ->setRequired(TRUE)
-      ->setDisplayConfigurable('view', TRUE);
-    $fields['tax_amount'] = BaseFieldDefinition::create('commerce_price')
-      ->setLabel(t('Tax amount'))
-      ->setDescription(t('The tax amount.'))
-      ->setRequired(TRUE)
-      ->setDisplayConfigurable('view', TRUE);
-    $fields['shipping_amount'] = BaseFieldDefinition::create('commerce_price')
-      ->setLabel(t('Shipping amount'))
-      ->setDescription(t('The shipping amount.'))
-      ->setRequired(TRUE)
-      ->setDisplayConfigurable('view', TRUE);
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time when the order report was created.'))
+      ->setReadOnly(TRUE);
+    $fields['updated'] = BaseFieldDefinition::create('timestamp')
+      ->setLabel(t('Created'))
+      ->setDescription(t('The time when the order report was updated.'))
       ->setReadOnly(TRUE);
 
     return $fields;
