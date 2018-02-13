@@ -5,6 +5,7 @@ namespace Drupal\commerce_reports\Plugin\Commerce\ReportType;
 use Drupal\commerce\BundlePluginInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_reports\Entity\OrderReportInterface;
+use Drupal\Core\Entity\Query\QueryAggregateInterface;
 
 /**
  * Defines the interface for order report types.
@@ -38,5 +39,16 @@ interface ReportTypeInterface extends BundlePluginInterface {
    *   The order.
    */
   public function generateReport(OrderReportInterface $order_report, OrderInterface $order);
+
+  /**
+   * Builds the aggregate query.
+   *
+   * Report type plugins should add their field columns, aggregates, and
+   * groupBy statements here.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryAggregateInterface $query
+   *   The aggregate query.
+   */
+  public function buildQuery(QueryAggregateInterface $query);
 
 }

@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_reports\Plugin\Commerce\ReportType;
 
+use Drupal\Core\Entity\Query\QueryAggregateInterface;
 use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_reports\Entity\OrderReportInterface;
@@ -56,7 +57,16 @@ class OrderReport extends ReportTypeBase {
     /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
     $address = $billing_profile->get('address')->first();
     $order_report->get('billing_address')->setValue($address->toArray());
+  }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function buildQuery(QueryAggregateInterface $query) {
+    $query->aggregate('mail', 'COUNT');
+    $query->aggregate('amount.number', 'SUM');
+    $query->aggregate('amount.number', 'AVG');
+    $query->groupBy('amount.currency_code');
   }
 
 }

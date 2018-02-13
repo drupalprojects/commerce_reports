@@ -1,0 +1,12 @@
+<?php
+
+use Drupal\Core\Database\Query\AlterableInterface;
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function commerce_reports_query_commerce_reports_alter(AlterableInterface $query) {
+  /** @var \Drupal\commerce_reports\ReportQueryBuilder $query_builder */
+  $query_builder = \Drupal::service('commerce_reports.query_builder');
+  $query_builder->alterQuery($query);
+}
