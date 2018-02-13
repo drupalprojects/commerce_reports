@@ -2,9 +2,6 @@
 
 namespace Drupal\commerce_reports\Entity;
 
-use Drupal\Core\Annotation\PluralTranslation;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Entity\Annotation\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;

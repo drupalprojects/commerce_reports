@@ -1,0 +1,7 @@
+commerce_reports.overview:
+  path: '/admin/commerce/reports'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Reports'
+  requirements:
+    _permission: 'access commerce reports'
