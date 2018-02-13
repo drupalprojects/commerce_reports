@@ -51,16 +51,12 @@ class OrderReportTest extends CommerceKernelTestBase {
       'type' => 'order_report',
       'order_id' => $order->id(),
       'amount' => new Price('1.00', 'USD'),
-      'tax_amount' => new Price('2.00', 'USD'),
-      'shipping_amount' => new Price('3.00', 'USD'),
       'created' => $time,
     ]);
     $order_report->save();
 
     $this->assertEquals($order->id(), $order_report->getOrderId());
     $this->assertEquals(new Price('1.00', 'USD'), $order_report->get('amount')->first()->toPrice());
-    // $this->assertEquals(new Price('2.00', 'USD'), $order_report->getTaxAmount());
-    // $this->assertEquals(new Price('3.00', 'USD'), $order_report->getShippingAmount());
     $this->assertEquals($time, $order_report->getCreatedTime());
   }
 
