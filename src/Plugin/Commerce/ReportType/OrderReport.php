@@ -2,15 +2,12 @@
 
 namespace Drupal\commerce_reports\Plugin\Commerce\ReportType;
 
-use Drupal\commerce\BundleFieldDefinition;
+use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\commerce_reports\Annotation\CommerceReportType;
 use Drupal\commerce_reports\Entity\OrderReportInterface;
-use Drupal\Core\Annotation\Translation;
-use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
- * Provides the basic Order Report
+ * Provides the basic Order Report.
  *
  * @CommerceReportType(
  *   id = "order_report",
@@ -31,6 +28,19 @@ class OrderReport extends ReportTypeBase {
       ->setCardinality(1)
       ->setRequired(TRUE)
       ->setDisplayConfigurable('view', TRUE);
+    $fields['mail'] = BundleFieldDefinition::create('email')
+      ->setLabel(t('Contact email'))
+      ->setDescription(t('The email address associated with the order.'))
+      ->setCardinality(1)
+      ->setSetting('max_length', 255)
+      ->setRequired(TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+    $fields['billing_address'] = BundleFieldDefinition::create('address')
+      ->setLabel(t('Address'))
+      ->setDescription(t('The store address.'))
+      ->setCardinality(1)
+      ->setRequired(TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     return $fields;
   }
@@ -40,6 +50,13 @@ class OrderReport extends ReportTypeBase {
    */
   public function generateReport(OrderReportInterface $order_report, OrderInterface $order) {
     $order_report->get('amount')->setValue($order->getTotalPrice());
+    $order_report->get('mail')->setValue($order->getEmail());
+
+    $billing_profile = $order->getBillingProfile();
+    /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
+    $address = $billing_profile->get('address')->first();
+    $order_report->get('billing_address')->setValue($address->toArray());
+
   }
 
 }
