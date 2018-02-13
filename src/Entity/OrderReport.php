@@ -86,6 +86,11 @@ class OrderReport extends ContentEntityBase implements OrderReportInterface {
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 
+    $fields['order_id'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Order'))
+      ->setDescription(t('The parent order.'))
+      ->setSetting('target_type', 'commerce_order')
+      ->setReadOnly(TRUE);
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time when the order report was created.'))

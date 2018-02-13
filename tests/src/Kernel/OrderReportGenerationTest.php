@@ -3,6 +3,7 @@
 namespace Drupal\Tests\commerce_reports\Kernel;
 
 use Drupal\commerce_order\Entity\Order;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_product\Entity\Product;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_reports\Entity\OrderReport;
@@ -78,12 +79,12 @@ class OrderReportGenerationTest extends CommerceKernelTestBase {
       'quantity' => 1,
     ]);
     $order_item->save();
-    $order->setRefreshState(Order::REFRESH_SKIP);
     $order->addItem($order_item);
+    $order->setRefreshState(OrderInterface::REFRESH_SKIP);
     $order->save();
     $workflow = $order->getState()->getWorkflow();
     $order->getState()->applyTransition($workflow->getTransition('place'));
-    $order->setRefreshState(Order::REFRESH_SKIP);
+    $order->setRefreshState(OrderInterface::REFRESH_SKIP);
     $order->save();
 
     $this->assertEquals([$order->id()], $this->container->get('state')->get('commerce_order_reports'));
@@ -93,7 +94,7 @@ class OrderReportGenerationTest extends CommerceKernelTestBase {
     $order_report = OrderReport::load(1);
     $this->assertEquals($order_report->getOrderId(), $order->id());
     $this->assertTrue($order_report->hasField('amount'), 'Default order report has the amount field');
-    $this->assertEquals($order_report->get('amount')->first()->getValue()['number'], $order->getTotalPrice()->getNumber());
+    $this->assertEquals($order_report->get('amount')->first()->toPrice(), $order->getTotalPrice());
   }
 
 }

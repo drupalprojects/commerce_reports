@@ -2,7 +2,6 @@
 
 namespace Drupal\commerce_reports\EventSubscriber;
 
-use Drupal\commerce_reports\Plugin\Commerce\ReportType\OrderReportTypeInterface;
 use Drupal\commerce_reports\ReportTypeManager;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
@@ -24,6 +23,13 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
   protected $orderStorage;
 
   /**
+   * The order report storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $orderReportStorage;
+
+  /**
    * The state key/value store.
    *
    * @var \Drupal\Core\State\StateInterface
@@ -31,9 +37,11 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
   protected $state;
 
   /**
-   * @var \Drupal\commerce_payment\OrderReportTypeManager
+   * The report type manager.
+   *
+   * @var \Drupal\commerce_reports\ReportTypeManager
    */
-  protected $orderReportTypeManager;
+  protected $reportTypeManager;
 
   /**
    * Constructs a new OrderPlacedEventSubscriber object.
@@ -42,17 +50,22 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
    *   The entity type manager.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key/value store.
-   * @param \Drupal\commerce_payment\OrderReportTypeManager
+   * @param \Drupal\commerce_reports\ReportTypeManager $report_type_manager
    *   The order report type manager.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, StateInterface $state, ReportTypeManager $orderReportTypeManager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, StateInterface $state, ReportTypeManager $report_type_manager) {
     $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
+    $this->orderReportStorage = $entity_type_manager->getStorage('commerce_order_report');
     $this->state = $state;
-    $this->orderReportTypeManager = $orderReportTypeManager;
+    $this->reportTypeManager = $report_type_manager;
   }
 
   /**
    * Flags the order to have a report generated.
+   *
+   * @todo come up with better flagging.
    *
    * @param \Drupal\state_machine\Event\WorkflowTransitionEvent $event
    *   The workflow transition event.
@@ -67,22 +80,37 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
   /**
    * Generates order reports once output flushed.
    *
+   * This creates the base order report populated with the bundle plugin ID,
+   * order ID, and created timestamp from when the order was placed. Each
+   * plugin then sets its values.
+   *
    * @param \Symfony\Component\HttpKernel\Event\PostResponseEvent $event
    *   The post response event.
+   *
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function generateReports(PostResponseEvent $event) {
     $order_ids = $this->state->get('commerce_order_reports', []);
     $orders = $this->orderStorage->loadMultiple($order_ids);
-    /** @var OrderReportTypeInterface[] $plugin_types */
-    $plugin_types = $this->orderReportTypeManager->getDefinitions();
+    $plugin_types = $this->reportTypeManager->getDefinitions();
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
     foreach ($orders as $order) {
       foreach ($plugin_types as $plugin_type) {
-        $instance = $this->orderReportTypeManager->createInstance($plugin_type['id'], []);
-        $instance->generateReport($order);
+        /** @var \Drupal\commerce_reports\Plugin\Commerce\ReportType\ReportTypeInterface $instance */
+        $instance = $this->reportTypeManager->createInstance($plugin_type['id'], []);
+        $order_report = $this->orderReportStorage->create([
+          'type' => $plugin_type['id'],
+          'order_id' => $order->id(),
+          'created' => $order->getPlacedTime(),
+        ]);
+        $instance->generateReport($order_report, $order);
+        // @todo Fire an event allowing modification of report entity.
+        // @todo Above may not be needed with storage events.
+        $order_report->save();
       }
     }
 
+    // @todo this could lose data, possibly as its global state.
     $this->state->set('commerce_order_reports', []);
   }
 
