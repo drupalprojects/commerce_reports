@@ -51,4 +51,15 @@ interface ReportTypeInterface extends BundlePluginInterface {
    */
   public function buildQuery(QueryAggregateInterface $query);
 
+  /**
+   * Build a report table from query results.
+   *
+   * @param array $results
+   *   The report query results.
+   *
+   * @return array
+   *   The render array.
+   */
+  public function buildReportTable(array $results);
+
 }

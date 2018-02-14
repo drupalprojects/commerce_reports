@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_reports\Plugin\Commerce\ReportType;
 
+use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 use Drupal\entity\BundleFieldDefinition;
 use Drupal\commerce_order\Entity\OrderInterface;
@@ -67,6 +68,52 @@ class OrderReport extends ReportTypeBase {
     $query->aggregate('amount.number', 'SUM');
     $query->aggregate('amount.number', 'AVG');
     $query->groupBy('amount.currency_code');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doBuildReportTableHeaders() {
+    return [
+      'formatted_date' => t('Date'),
+      'order_id_count' => t('# Orders'),
+      'mail_count' => t('# Customers'),
+      'amountnumber_sum' => t('Total revenue'),
+      'amountnumber_avg' => t('Average revenue'),
+      'amount_currency_code' => t('Currency'),
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doBuildReportTableRow(array $result) {
+    $currency_code = $result['amount_currency_code'];
+    $row = [
+      $result['formatted_date'],
+      $result['order_id_count'],
+      $result['mail_count'],
+      [
+        'data' => [
+          '#type' => 'inline_template',
+          '#template' => '{{price|commerce_price_format}}',
+          '#context' => [
+            'price' => new Price($result['amountnumber_sum'], $currency_code),
+          ],
+        ],
+      ],
+      [
+        'data' => [
+          '#type' => 'inline_template',
+          '#template' => '{{price|commerce_price_format}}',
+          '#context' => [
+            'price' => new Price($result['amountnumber_avg'], $currency_code),
+          ],
+        ],
+      ],
+      $currency_code,
+    ];
+    return $row;
   }
 
 }

@@ -5,3 +5,11 @@ commerce_reports.overview:
     _title: 'Reports'
   requirements:
     _permission: 'access commerce reports'
+commerce_reports.report:
+  path: '/admin/commerce/reports/{report_type_id}/{type}'
+  defaults:
+    _controller: '\Drupal\commerce_reports\Controller\ReportTable::viewReport'
+    _title: 'View report'
+    type: 'month'
+  requirements:
+    _permission: 'access commerce reports'
