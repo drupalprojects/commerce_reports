@@ -17,7 +17,7 @@ use Drupal\commerce_reports\Entity\OrderReportInterface;
  *   description = @Translation("Basic order report with order id, total, and created date")
  * )
  */
-class OrderReport extends ReportTypeBase {
+class OrderReport extends ReportTypeBase implements OrderReportTypeInterface {
 
   /**
    * {@inheritdoc}

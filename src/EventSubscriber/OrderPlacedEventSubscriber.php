@@ -2,6 +2,8 @@
 
 namespace Drupal\commerce_reports\EventSubscriber;
 
+use Drupal\commerce_reports\Plugin\Commerce\ReportType\OrderItemReportTypeInterface;
+use Drupal\commerce_reports\Plugin\Commerce\ReportType\OrderReportTypeInterface;
 use Drupal\commerce_reports\ReportTypeManager;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
@@ -98,15 +100,31 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
       foreach ($plugin_types as $plugin_type) {
         /** @var \Drupal\commerce_reports\Plugin\Commerce\ReportType\ReportTypeInterface $instance */
         $instance = $this->reportTypeManager->createInstance($plugin_type['id'], []);
-        $order_report = $this->orderReportStorage->create([
-          'type' => $plugin_type['id'],
-          'order_id' => $order->id(),
-          'created' => $order->getPlacedTime(),
-        ]);
-        $instance->generateReport($order_report, $order);
-        // @todo Fire an event allowing modification of report entity.
-        // @todo Above may not be needed with storage events.
-        $order_report->save();
+
+        if ($instance instanceof OrderReportTypeInterface) {
+          $order_report = $this->orderReportStorage->create([
+            'type' => $plugin_type['id'],
+            'order_id' => $order->id(),
+            'created' => $order->getPlacedTime(),
+          ]);
+          $instance->generateReport($order_report, $order);
+          // @todo Fire an event allowing modification of report entity.
+          // @todo Above may not be needed with storage events.
+          $order_report->save();
+        }
+        elseif ($instance instanceof OrderItemReportTypeInterface) {
+          foreach ($order->getItems() as $order_item) {
+            $order_report = $this->orderReportStorage->create([
+              'type' => $plugin_type['id'],
+              'order_id' => $order->id(),
+              'created' => $order->getPlacedTime(),
+            ]);
+            $instance->generateReport($order_report, $order_item);
+            // @todo Fire an event allowing modification of report entity.
+            // @todo Above may not be needed with storage events.
+            $order_report->save();
+          }
+        }
       }
     }
 

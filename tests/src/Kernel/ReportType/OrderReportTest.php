@@ -71,7 +71,7 @@ class OrderReportTest extends CommerceKernelTestBase {
    * Tests order report entity.
    */
   public function testOrderReport() {
-    /** @var \Drupal\commerce_reports\Plugin\Commerce\ReportType\ReportTypeInterface $report_type_plugin */
+    /** @var \Drupal\commerce_reports\Plugin\Commerce\ReportType\OrderReportTypeInterface $report_type_plugin */
     $report_type_plugin = $this->reportTypeManager->createInstance('order_report');
     /** @var \Drupal\profile\Entity\Profile $profile */
     $profile = Profile::create([
