@@ -2,11 +2,10 @@
 
 namespace Drupal\commerce_reports\Plugin\Commerce\ReportType;
 
-use Drupal\commerce_order\Entity\OrderItemInterface;
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 use Drupal\entity\BundleFieldDefinition;
-use Drupal\commerce_reports\Entity\OrderReportInterface;
 
 /**
  * Provides the Order Items Report.
@@ -17,7 +16,7 @@ use Drupal\commerce_reports\Entity\OrderReportInterface;
  *   description = @Translation("Order items.")
  * )
  */
-class OrderItemsReport extends ReportTypeBase implements OrderItemReportTypeInterface {
+class OrderItemsReport extends ReportTypeBase {
 
   /**
    * {@inheritdoc}
@@ -119,14 +118,19 @@ class OrderItemsReport extends ReportTypeBase implements OrderItemReportTypeInte
   /**
    * {@inheritdoc}
    */
-  public function generateReport(OrderReportInterface $order_report, OrderItemInterface $order_item) {
-    $order_report->get('order_item_id')->setValue($order_item->id());
-    $order_report->get('title')->setValue($order_item->label());
-    $order_report->get('quantity')->setValue($order_item->getQuantity());
-    $order_report->get('unit_price')->setValue($order_item->getUnitPrice());
-    $order_report->get('total_price')->setValue($order_item->getTotalPrice());
-    $order_report->get('adjusted_unit_price')->setValue($order_item->getAdjustedUnitPrice());
-    $order_report->get('adjusted_total_price')->setValue($order_item->getAdjustedTotalPrice());
+  public function generateReports(OrderInterface $order) {
+    foreach ($order->getItems() as $order_item) {
+      $values = [
+        'order_item_id' => $order_item->id(),
+        'title' => $order_item->label(),
+        'quantity' => $order_item->getQuantity(),
+        'unit_price' => $order_item->getUnitPrice(),
+        'total_price' => $order_item->getTotalPrice(),
+        'adjusted_unit_price' => $order_item->getAdjustedUnitPrice(),
+        'adjusted_total_price' => $order_item->getAdjustedTotalPrice(),
+      ];
+      $this->createFromOrder($order, $values);
+    }
   }
 
   /**

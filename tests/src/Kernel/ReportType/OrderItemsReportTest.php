@@ -51,6 +51,7 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
+    $this->installEntitySchema('commerce_order_report');
     $this->installConfig('commerce_order');
 
     $this->reportTypeManager = $this->container->get('plugin.manager.commerce_report_type');
@@ -84,7 +85,7 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
    * Tests order report entity.
    */
   public function testOrderReport() {
-    /** @var \Drupal\commerce_reports\Plugin\Commerce\ReportType\OrderItemReportTypeInterface $report_type_plugin */
+    /** @var \Drupal\commerce_reports\Plugin\Commerce\ReportType\ReportTypeInterface $report_type_plugin */
     $report_type_plugin = $this->reportTypeManager->createInstance('order_items_report');
     /** @var \Drupal\profile\Entity\Profile $profile */
     $profile = Profile::create([
@@ -122,7 +123,9 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
     ]);
     // Set quantity so total price calculates.
     $order_item1->setQuantity(2);
+    $order_item1->save();
     $order->addItem($order_item1);
+
     $order_item2 = OrderItem::create([
       'title' => 'Product 2',
       'type' => 'test',
@@ -130,16 +133,18 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
     ]);
     // Set quantity so total price calculates.
     $order_item2->setQuantity(4);
+    $order_item2->save();
     $order->addItem($order_item2);
 
-    /** @var \Drupal\commerce_reports\Entity\OrderReport $order_report */
-    $order_report = OrderReport::create([
-      'type' => 'order_items_report',
-      'order_id' => $order->id(),
-      'created' => $order->getPlacedTime(),
-    ]);
+    $order->save();
+    $this->assertEquals(2, count($order->getItems()));
 
-    $report_type_plugin->generateReport($order_report, $order_item1);
+    $report_type_plugin->generateReports($order);
+
+    /** @var \Drupal\commerce_reports\Entity\OrderReport[] $order_reports */
+    $order_reports = OrderReport::loadMultiple();
+    $this->assertEquals(2, count($order_reports));
+    $order_report = reset($order_reports);
 
     $this->assertEquals('1518491883', $order_report->getCreatedTime());
     $this->assertEquals(1234, $order_report->getOrderId());
@@ -168,6 +173,7 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
       'amount' => new Price('2.00', 'USD'),
     ]);
     $order_item2->setAdjustments($adjustments);
+    $order_item2->save();
     $this->assertEquals($adjustments, $order_item2->getAdjustments());
     $this->assertEquals(new Price('29.00', 'USD'), $order_item2->getAdjustedUnitPrice());
     $this->assertEquals(new Price('116.00', 'USD'), $order_item2->getAdjustedTotalPrice());
@@ -179,7 +185,16 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
       'created' => $order->getPlacedTime(),
     ]);
 
-    $report_type_plugin->generateReport($order_report, $order_item2);
+    // Delete order reports and regenerate.
+    foreach ($order_reports as $order_report) {
+      $order_report->delete();
+    }
+    $report_type_plugin->generateReports($order);
+
+    /** @var \Drupal\commerce_reports\Entity\OrderReport[] $order_reports */
+    $order_reports = OrderReport::loadMultiple();
+    $this->assertEquals(2, count($order_reports));
+    $order_report = next($order_reports);
 
     $this->assertEquals('1518491883', $order_report->getCreatedTime());
     $this->assertEquals(1234, $order_report->getOrderId());

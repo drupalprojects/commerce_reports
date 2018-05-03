@@ -2,6 +2,7 @@
 
 namespace Drupal\commerce_reports\Plugin\Commerce\ReportType;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\entity\BundlePlugin\BundlePluginInterface;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 
@@ -47,5 +48,23 @@ interface ReportTypeInterface extends BundlePluginInterface {
    *   The render array.
    */
   public function buildReportTable(array $results);
+
+  /**
+   * Generates order reports for an order.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   */
+  public function generateReports(OrderInterface $order);
+
+  /**
+   * Creates a new order report using the given order and values.
+   *
+   * @param \Drupal\commerce_order\Entity\OrderInterface $order
+   *   The order.
+   * @param array $values
+   *   (optional) An array of values to set, keyed by property name.
+   */
+  public function createFromOrder(OrderInterface $order, array $values = []);
 
 }

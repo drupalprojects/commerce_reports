@@ -48,6 +48,7 @@ class OrderReportTest extends CommerceKernelTestBase {
     $this->installEntitySchema('profile');
     $this->installEntitySchema('commerce_order');
     $this->installEntitySchema('commerce_order_item');
+    $this->installEntitySchema('commerce_order_report');
     $this->installConfig('commerce_order');
 
     $this->reportTypeManager = $this->container->get('plugin.manager.commerce_report_type');
@@ -71,7 +72,7 @@ class OrderReportTest extends CommerceKernelTestBase {
    * Tests order report entity.
    */
   public function testOrderReport() {
-    /** @var \Drupal\commerce_reports\Plugin\Commerce\ReportType\OrderReportTypeInterface $report_type_plugin */
+    /** @var \Drupal\commerce_reports\Plugin\Commerce\ReportType\ReportTypeInterface $report_type_plugin */
     $report_type_plugin = $this->reportTypeManager->createInstance('order_report');
     /** @var \Drupal\profile\Entity\Profile $profile */
     $profile = Profile::create([
@@ -103,14 +104,11 @@ class OrderReportTest extends CommerceKernelTestBase {
     ]);
     $order->get('total_price')->setValue(new Price('100.00', 'USD'));
 
-    /** @var \Drupal\commerce_reports\Entity\OrderReport $order_report */
-    $order_report = OrderReport::create([
-      'type' => 'order_report',
-      'order_id' => $order->id(),
-      'created' => $order->getPlacedTime(),
-    ]);
-
-    $report_type_plugin->generateReport($order_report, $order);
+    $report_type_plugin->generateReports($order);
+    /** @var \Drupal\commerce_reports\Entity\OrderReport[] $order_reports */
+    $order_reports = OrderReport::loadMultiple();
+    $this->assertEquals(1, count($order_reports));
+    $order_report = reset($order_reports);
 
     $this->assertEquals('1518491883', $order_report->getCreatedTime());
     $this->assertEquals(1234, $order_report->getOrderId());

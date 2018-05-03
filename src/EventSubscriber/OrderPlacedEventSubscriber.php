@@ -2,8 +2,6 @@
 
 namespace Drupal\commerce_reports\EventSubscriber;
 
-use Drupal\commerce_reports\Plugin\Commerce\ReportType\OrderItemReportTypeInterface;
-use Drupal\commerce_reports\Plugin\Commerce\ReportType\OrderReportTypeInterface;
 use Drupal\commerce_reports\ReportTypeManager;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
@@ -23,13 +21,6 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected $orderStorage;
-
-  /**
-   * The order report storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $orderReportStorage;
 
   /**
    * The state key/value store.
@@ -59,7 +50,6 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, StateInterface $state, ReportTypeManager $report_type_manager) {
     $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
-    $this->orderReportStorage = $entity_type_manager->getStorage('commerce_order_report');
     $this->state = $state;
     $this->reportTypeManager = $report_type_manager;
   }
@@ -100,31 +90,7 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
       foreach ($plugin_types as $plugin_type) {
         /** @var \Drupal\commerce_reports\Plugin\Commerce\ReportType\ReportTypeInterface $instance */
         $instance = $this->reportTypeManager->createInstance($plugin_type['id'], []);
-
-        if ($instance instanceof OrderReportTypeInterface) {
-          $order_report = $this->orderReportStorage->create([
-            'type' => $plugin_type['id'],
-            'order_id' => $order->id(),
-            'created' => $order->getPlacedTime(),
-          ]);
-          $instance->generateReport($order_report, $order);
-          // @todo Fire an event allowing modification of report entity.
-          // @todo Above may not be needed with storage events.
-          $order_report->save();
-        }
-        elseif ($instance instanceof OrderItemReportTypeInterface) {
-          foreach ($order->getItems() as $order_item) {
-            $order_report = $this->orderReportStorage->create([
-              'type' => $plugin_type['id'],
-              'order_id' => $order->id(),
-              'created' => $order->getPlacedTime(),
-            ]);
-            $instance->generateReport($order_report, $order_item);
-            // @todo Fire an event allowing modification of report entity.
-            // @todo Above may not be needed with storage events.
-            $order_report->save();
-          }
-        }
+        $instance->generateReports($order);
       }
     }
 

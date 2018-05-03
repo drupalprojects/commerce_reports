@@ -2,11 +2,10 @@
 
 namespace Drupal\commerce_reports\Plugin\Commerce\ReportType;
 
+use Drupal\commerce_order\Entity\OrderInterface;
 use Drupal\commerce_price\Price;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 use Drupal\entity\BundleFieldDefinition;
-use Drupal\commerce_order\Entity\OrderInterface;
-use Drupal\commerce_reports\Entity\OrderReportInterface;
 
 /**
  * Provides the basic Order Report.
@@ -17,7 +16,7 @@ use Drupal\commerce_reports\Entity\OrderReportInterface;
  *   description = @Translation("Basic order report with order id, total, and created date")
  * )
  */
-class OrderReport extends ReportTypeBase implements OrderReportTypeInterface {
+class OrderReport extends ReportTypeBase {
 
   /**
    * {@inheritdoc}
@@ -50,14 +49,16 @@ class OrderReport extends ReportTypeBase implements OrderReportTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function generateReport(OrderReportInterface $order_report, OrderInterface $order) {
-    $order_report->get('amount')->setValue($order->getTotalPrice());
-    $order_report->get('mail')->setValue($order->getEmail());
-
+  public function generateReports(OrderInterface $order) {
     $billing_profile = $order->getBillingProfile();
     /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
     $address = $billing_profile->get('address')->first();
-    $order_report->get('billing_address')->setValue($address->toArray());
+    $values = [
+      'amount' => $order->getTotalPrice(),
+      'mail' => $order->getEmail(),
+      'billing_address' => $address->toArray(),
+    ];
+    $this->createFromOrder($order, $values);
   }
 
   /**
