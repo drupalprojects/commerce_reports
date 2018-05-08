@@ -2,8 +2,7 @@
 
 namespace Drupal\commerce_reports\EventSubscriber;
 
-use Drupal\commerce_reports\ReportTypeManager;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\commerce_reports\OrderReportGeneratorInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\state_machine\Event\WorkflowTransitionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -16,13 +15,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class OrderPlacedEventSubscriber implements EventSubscriberInterface {
 
   /**
-   * The order storage.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected $orderStorage;
-
-  /**
    * The state key/value store.
    *
    * @var \Drupal\Core\State\StateInterface
@@ -30,28 +22,25 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
   protected $state;
 
   /**
-   * The report type manager.
+   * The order report generator.
    *
-   * @var \Drupal\commerce_reports\ReportTypeManager
+   * @var \Drupal\commerce_reports\OrderReportGeneratorInterface
    */
-  protected $reportTypeManager;
+  protected $orderReportGenerator;
 
   /**
    * Constructs a new OrderPlacedEventSubscriber object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key/value store.
-   * @param \Drupal\commerce_reports\ReportTypeManager $report_type_manager
-   *   The order report type manager.
+   * @param \Drupal\commerce_reports\OrderReportGeneratorInterface $order_report_generator
+   *   The order report generator.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, StateInterface $state, ReportTypeManager $report_type_manager) {
-    $this->orderStorage = $entity_type_manager->getStorage('commerce_order');
+  public function __construct(StateInterface $state, OrderReportGeneratorInterface $order_report_generator) {
     $this->state = $state;
-    $this->reportTypeManager = $report_type_manager;
+    $this->orderReportGenerator = $order_report_generator;
   }
 
   /**
@@ -83,16 +72,7 @@ class OrderPlacedEventSubscriber implements EventSubscriberInterface {
    */
   public function generateReports(PostResponseEvent $event) {
     $order_ids = $this->state->get('commerce_order_reports', []);
-    $orders = $this->orderStorage->loadMultiple($order_ids);
-    $plugin_types = $this->reportTypeManager->getDefinitions();
-    /** @var \Drupal\commerce_order\Entity\OrderInterface $order */
-    foreach ($orders as $order) {
-      foreach ($plugin_types as $plugin_type) {
-        /** @var \Drupal\commerce_reports\Plugin\Commerce\ReportType\ReportTypeInterface $instance */
-        $instance = $this->reportTypeManager->createInstance($plugin_type['id'], []);
-        $instance->generateReports($order);
-      }
-    }
+    $this->orderReportGenerator->generateReports($order_ids);
 
     // @todo this could lose data, possibly as its global state.
     $this->state->set('commerce_order_reports', []);
