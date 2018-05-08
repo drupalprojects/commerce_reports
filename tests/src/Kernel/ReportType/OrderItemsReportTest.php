@@ -26,6 +26,7 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
     'profile',
     'state_machine',
     'commerce_order',
+    'commerce_promotion',
     'commerce_reports',
   ];
 
