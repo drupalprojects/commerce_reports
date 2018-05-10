@@ -12,12 +12,13 @@ use Drupal\entity\BundleFieldDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provide a report for Promotions on behalf of commerce_promotion
+ * Provide a report for Promotions on behalf of commerce_promotion.
  *
  * @CommerceReportType(
  *   id = "promotion_report",
  *   label = @Translation("Promotion Report"),
  *   description = @Translation("Promotions Report"),
+ *   provider = "commerce_promotion",
  * )
  */
 class PromotionReport extends ReportTypeBase implements ContainerFactoryPluginInterface {
@@ -126,7 +127,7 @@ class PromotionReport extends ReportTypeBase implements ContainerFactoryPluginIn
         'coupon_code' => NULL,
       ];
 
-       /** @var \Drupal\commerce_promotion\Entity\CouponInterface $coupon */
+      /** @var \Drupal\commerce_promotion\Entity\CouponInterface $coupon */
       foreach ($coupons as $coupon) {
         if ($coupon->getPromotionId() == $adjustment->getSourceId()) {
           $values['coupon_id'] = $coupon->id();

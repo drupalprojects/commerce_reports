@@ -2,14 +2,13 @@
 
 namespace Drupal\Tests\commerce_reports\Kernel;
 
-use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Query\QueryAggregateInterface;
 use Drupal\Core\Entity\Query\Sql\QueryAggregate;
 use Drupal\Tests\commerce\Kernel\CommerceKernelTestBase;
 
 /**
- * Tests ReportQueryBuilder
+ * Tests ReportQueryBuilder.
  *
  * @group commerce_reports
  */
@@ -20,7 +19,6 @@ class ReportQueryBuilderTest extends CommerceKernelTestBase {
     'profile',
     'state_machine',
     'commerce_order',
-    'commerce_promotion',
     'commerce_reports',
   ];
 
@@ -119,6 +117,15 @@ class ReportQueryBuilderTest extends CommerceKernelTestBase {
     }
   }
 
+  /**
+   * Gets an sql query from an aggreggate query.
+   *
+   * @param \Drupal\Core\Entity\Query\Sql\QueryAggregate $query
+   *   The aggregate query.
+   *
+   * @return \Drupal\Core\Database\Query\SelectInterface
+   *   The sql query.
+   */
   protected function getSqlQueryFromAggregateQuery(QueryAggregate $query) {
     $query->prepare();
     $reflection = new \ReflectionObject($query);

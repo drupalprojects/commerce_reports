@@ -27,7 +27,6 @@ class OrderReportGeneratorTest extends CommerceKernelTestBase {
     'state_machine',
     'commerce_order',
     'commerce_product',
-    'commerce_promotion',
     'commerce_reports',
   ];
 
@@ -62,7 +61,6 @@ class OrderReportGeneratorTest extends CommerceKernelTestBase {
     $this->installEntitySchema('commerce_order_item');
     $this->installEntitySchema('commerce_product');
     $this->installEntitySchema('commerce_product_variation');
-    $this->installEntitySchema('commerce_promotion');
     $this->installConfig('commerce_order');
     $this->installConfig('commerce_product');
     $this->installEntitySchema('commerce_order_report');

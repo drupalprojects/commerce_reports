@@ -26,7 +26,6 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
     'profile',
     'state_machine',
     'commerce_order',
-    'commerce_promotion',
     'commerce_reports',
   ];
 
@@ -167,7 +166,7 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
       'label' => '10% off',
       'amount' => new Price('-3.00', 'USD'),
       'percentage' => '0.1',
-    ]);   
+    ]);
     $adjustments[] = new Adjustment([
       'type' => 'custom',
       'label' => 'Random fee',
