@@ -12,3 +12,14 @@ commerce_reports.report.order_report:
     report_type_id: 'order_report'
     type: 'month'
   parent: 'commerce_reports.overview'
+
+commerce_reports.configuration:
+  title: 'Reports'
+  route_name: 'commerce_reports.configuration'
+  parent: 'commerce.configuration'
+
+commerce_reports.generate_form:
+  title: 'Generate reports'
+  route_name: 'commerce_reports.generate_form'
+  parent: 'commerce_reports.configuration'
+  description: 'Delete existing order reports and create new ones for one or all report types.'
