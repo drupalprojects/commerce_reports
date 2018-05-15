@@ -93,7 +93,7 @@ class OrderReport extends ContentEntityBase implements OrderReportInterface {
       ->setDescription(t('The time when the order report was created.'))
       ->setReadOnly(TRUE);
     $fields['updated'] = BaseFieldDefinition::create('timestamp')
-      ->setLabel(t('Created'))
+      ->setLabel(t('Updated'))
       ->setDescription(t('The time when the order report was updated.'))
       ->setReadOnly(TRUE);
 
