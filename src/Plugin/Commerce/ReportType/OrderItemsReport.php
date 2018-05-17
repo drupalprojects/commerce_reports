@@ -23,9 +23,14 @@ class OrderItemsReport extends ReportTypeBase {
    */
   public function buildFieldDefinitions() {
     $fields = [];
+    $fields['order_item_type_id'] = BundleFieldDefinition::create('entity_reference')
+      ->setLabel(t('Order item type'))
+      ->setDescription(t('The order item type.'))
+      ->setSetting('target_type', 'commerce_order_item_type')
+      ->setRequired(TRUE);
     $fields['order_item_id'] = BundleFieldDefinition::create('entity_reference')
-      ->setLabel(t('Order'))
-      ->setDescription(t('The parent order.'))
+      ->setLabel(t('Order item'))
+      ->setDescription(t('The parent order item.'))
       ->setSetting('target_type', 'commerce_order_item')
       ->setRequired(TRUE);
     $fields['title'] = BundleFieldDefinition::create('string')
@@ -121,6 +126,7 @@ class OrderItemsReport extends ReportTypeBase {
   public function generateReports(OrderInterface $order) {
     foreach ($order->getItems() as $order_item) {
       $values = [
+        'order_item_type_id' => $order_item->bundle(),
         'order_item_id' => $order_item->id(),
         'title' => $order_item->label(),
         'quantity' => $order_item->getQuantity(),

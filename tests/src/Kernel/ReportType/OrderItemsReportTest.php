@@ -72,6 +72,7 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
     $order_report = OrderReport::create([
       'type' => 'order_items_report',
     ]);
+    $this->assertTrue($order_report->hasField('order_item_type_id'));
     $this->assertTrue($order_report->hasField('order_item_id'));
     $this->assertTrue($order_report->hasField('title'));
     $this->assertTrue($order_report->hasField('quantity'));
@@ -148,8 +149,9 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
 
     $this->assertEquals('1518491883', $order_report->getCreatedTime());
     $this->assertEquals(1234, $order_report->getOrderId());
+    $this->assertFalse($order_report->get('order_item_type_id')->isEmpty());
+    $this->assertEquals('test', $order_report->get('order_item_type_id')->first()->target_id);
     $this->assertEquals(2, $order_report->get('quantity')->value);
-
     $this->assertFalse($order_report->get('unit_price')->isEmpty());
     $this->assertEquals(new Price('12.00', 'USD'), $order_report->get('unit_price')->first()->toPrice());
     $this->assertFalse($order_report->get('unit_price')->isEmpty());
@@ -198,6 +200,8 @@ class OrderItemsReportTest extends CommerceKernelTestBase {
 
     $this->assertEquals('1518491883', $order_report->getCreatedTime());
     $this->assertEquals(1234, $order_report->getOrderId());
+    $this->assertFalse($order_report->get('order_item_type_id')->isEmpty());
+    $this->assertEquals('test', $order_report->get('order_item_type_id')->first()->target_id);
     $this->assertEquals(4, $order_report->get('quantity')->value);
 
     $this->assertFalse($order_report->get('unit_price')->isEmpty());

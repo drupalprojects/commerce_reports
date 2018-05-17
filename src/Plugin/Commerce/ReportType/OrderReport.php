@@ -23,6 +23,11 @@ class OrderReport extends ReportTypeBase {
    */
   public function buildFieldDefinitions() {
     $fields = [];
+    $fields['order_type_id'] = BundleFieldDefinition::create('entity_reference')
+      ->setLabel(t('Order type'))
+      ->setDescription(t('The order type.'))
+      ->setSetting('target_type', 'commerce_order_type')
+      ->setReadOnly(TRUE);
     $fields['amount'] = BundleFieldDefinition::create('commerce_price')
       ->setLabel(t('Total Amount'))
       ->setDescription(t('The total amount of the order'))
@@ -54,6 +59,7 @@ class OrderReport extends ReportTypeBase {
     /** @var \Drupal\address\Plugin\Field\FieldType\AddressItem $address */
     $address = $billing_profile->get('address')->first();
     $values = [
+      'order_type_id' => $order->bundle(),
       'amount' => $order->getTotalPrice(),
       'mail' => $order->getEmail(),
       'billing_address' => $address->toArray(),

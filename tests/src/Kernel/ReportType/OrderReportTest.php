@@ -63,6 +63,7 @@ class OrderReportTest extends CommerceKernelTestBase {
     $order_report = OrderReport::create([
       'type' => 'order_report',
     ]);
+    $this->assertTrue($order_report->hasField('order_type_id'));
     $this->assertTrue($order_report->hasField('amount'));
     $this->assertTrue($order_report->hasField('mail'));
     $this->assertTrue($order_report->hasField('billing_address'));
@@ -112,6 +113,9 @@ class OrderReportTest extends CommerceKernelTestBase {
 
     $this->assertEquals('1518491883', $order_report->getCreatedTime());
     $this->assertEquals(1234, $order_report->getOrderId());
+
+    $this->assertFalse($order_report->get('order_type_id')->isEmpty());
+    $this->assertEquals($order->bundle(), $order_report->get('order_type_id')->first()->target_id);
 
     $this->assertFalse($order_report->get('amount')->isEmpty());
     $this->assertEquals(new Price('100.00', 'USD'), $order_report->get('amount')->first()->toPrice());
