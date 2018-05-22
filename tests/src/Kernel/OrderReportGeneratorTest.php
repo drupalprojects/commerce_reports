@@ -145,12 +145,10 @@ class OrderReportGeneratorTest extends CommerceKernelTestBase {
     $this->assertNotEmpty($order_reports);
 
     /** @var \Drupal\commerce_reports\Entity\OrderReport $order_report */
+    foreach ($order_reports as $order_report) {
+      $this->assertEquals($order_report->getOrderId(), $order->id());
+    }
     $order_report = OrderReport::load(1);
-    $this->assertEquals($order_report->getOrderId(), $order->id());
-
-    // NOTE: this assumes that the OrderReport plugin produces the first report.
-    $this->assertTrue($order_report->hasField('amount'), 'Default order report has the amount field');
-    $this->assertEquals($order_report->get('amount')->first()->toPrice(), $order->getTotalPrice());
 
     // Create a second order.
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order_2 */
@@ -218,12 +216,9 @@ class OrderReportGeneratorTest extends CommerceKernelTestBase {
     $reports_created = count($order_reports);
 
     /** @var \Drupal\commerce_reports\Entity\OrderReport $order_report */
-    $order_report = OrderReport::load(1);
-    $this->assertEquals($order_report->getOrderId(), $order->id());
-
-    // NOTE: this assumes that the OrderReport plugin produces the first report.
-    $this->assertTrue($order_report->hasField('amount'), 'Default order report has the amount field');
-    $this->assertEquals($order_report->get('amount')->first()->toPrice(), $order->getTotalPrice());
+    foreach (OrderReport::loadMultiple() as $order_report) {
+      $this->assertEquals($order_report->getOrderId(), $order->id());
+    }
 
     // Change the order amount and verify that new order report is generated.
     $order_item->setQuantity(2);
@@ -240,12 +235,6 @@ class OrderReportGeneratorTest extends CommerceKernelTestBase {
     for ($index = 1; $index <= $reports_created; $index++) {
       $this->assertEmpty(OrderReport::load($index));
     }
-
-    // Verify newly generated order report.
-    $order_report = OrderReport::load($index);
-    $this->assertEquals($order_report->getOrderId(), $order->id());
-    $this->assertTrue($order_report->hasField('amount'), 'Default order report has the amount field');
-    $this->assertEquals($order_report->get('amount')->first()->toPrice(), $order->getTotalPrice());
 
     // Create a second order.
     /** @var \Drupal\commerce_order\Entity\OrderInterface $order_2 */
@@ -361,12 +350,16 @@ class OrderReportGeneratorTest extends CommerceKernelTestBase {
     $processed = $orderReportGenerator->refreshReports([$order->id()], 'order_report');
     $this->assertEquals($processed, 1);
     $order_reports = OrderReport::loadMultiple();
-    $this->assertNotEmpty($order_reports);
-    foreach ($order_reports as $order_report) {
-      $this->assertEquals('order_report', $order_report->bundle());
-    }
+    $this->assertEquals(count($order_reports), 1);
+     /** @var \Drupal\commerce_reports\Entity\OrderReport $order_report */
+    $order_report = reset($order_reports);
+    // Verify order report data.
+    $this->assertEquals('order_report', $order_report->bundle());
+    $this->assertEquals($order_report->getOrderId(), $order->id());
+    $this->assertTrue($order_report->hasField('amount'), 'Default order report has the amount field');
+    $this->assertEquals($order_report->get('amount')->first()->toPrice(), $order->getTotalPrice());
 
-    // Verify that existing order reports are not deleted.
+    // Verify that existing order reports are not deleted when order item reports generated.
     $processed = $orderReportGenerator->refreshReports([$order->id()], 'order_items_report');
     $this->assertEquals($processed, 1);
     $order_reports = OrderReport::loadMultiple();

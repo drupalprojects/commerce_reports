@@ -110,10 +110,9 @@ class OrderReportGenerationTest extends CommerceKernelTestBase {
     $this->container->get('event_dispatcher')->dispatch(KernelEvents::TERMINATE, new PostResponseEvent($this->container->get('kernel'), new Request(), new Response()));
     $this->assertEquals([], $this->container->get('state')->get('commerce_order_reports'));
     /** @var \Drupal\commerce_reports\Entity\OrderReport $order_report */
-    $order_report = OrderReport::load(1);
-    $this->assertEquals($order_report->getOrderId(), $order->id());
-    $this->assertTrue($order_report->hasField('amount'), 'Default order report has the amount field');
-    $this->assertEquals($order_report->get('amount')->first()->toPrice(), $order->getTotalPrice());
+    foreach (OrderReport::loadMultiple() as $order_report) {
+      $this->assertEquals($order_report->getOrderId(), $order->id());
+    }
   }
 
 }
