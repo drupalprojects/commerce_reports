@@ -25,7 +25,7 @@ use Drupal\Core\Field\BaseFieldDefinition;
  *     "permission_provider" = "Drupal\commerce\EntityPermissionProvider",
  *     "list_builder" = "Drupal\commerce_reports\ReportsListBuilder",
  *     "storage" = "Drupal\Core\Entity\Sql\SqlContentEntityStorage",
- *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "views_data" = "\Drupal\commerce_reports\OrderReportViewsData",
  *     "route_provider" = {
  *       "default" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
