@@ -93,14 +93,16 @@ class ReportDateField extends EntityField {
 
   public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
     parent::init($view, $display, $options);
-    $this->dateFormat = $this->options['settings']['date_format'];
-    if ($this->dateFormat == 'custom') {
-      $this->dateFormatString = $this->options['settings']['custom_date_format'];
-    }
-    else {
-      /* @var \Drupal\Core\Datetime\DateFormatInterface $formatter */
-      $formatter = $this->entityManager->getStorage('date_format')->load($this->dateFormat);
-      $this->dateFormatString = $formatter->getPattern();
+    if (!empty($this->options['settings']['date_format'])) {
+      $this->dateFormat = $this->options['settings']['date_format'];
+      if ($this->dateFormat == 'custom') {
+        $this->dateFormatString = $this->options['settings']['custom_date_format'];
+      }
+      else {
+        /* @var \Drupal\Core\Datetime\DateFormatInterface $formatter */
+        $formatter = $this->entityManager->getStorage('date_format')->load($this->dateFormat);
+        $this->dateFormatString = $formatter->getPattern();
+      }
     }
   }
 
