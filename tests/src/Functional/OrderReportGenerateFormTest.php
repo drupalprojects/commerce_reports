@@ -45,6 +45,7 @@ class OrderReportGenerateFormTest extends CommerceBrowserTestBase {
 
   protected static $configSchemaCheckerExclusions = [
     'views.view.sales_report',
+    'views.view.purchased_items_report',
   ];
 
   /**
