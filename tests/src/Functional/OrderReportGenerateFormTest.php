@@ -33,6 +33,7 @@ class OrderReportGenerateFormTest extends CommerceBrowserTestBase {
    * @var array
    */
   public static $modules = [
+    'views',
     'path',
     'entity_reference_revisions',
     'profile',
@@ -40,6 +41,10 @@ class OrderReportGenerateFormTest extends CommerceBrowserTestBase {
     'commerce_order',
     'commerce_product',
     'commerce_reports',
+  ];
+
+  protected static $configSchemaCheckerExclusions = [
+    'views.view.sales_report',
   ];
 
   /**
