@@ -21,6 +21,7 @@ class OrderReportViewsData extends CommerceEntityViewsData {
    */
   protected function processViewsDataForCreated($table, FieldDefinitionInterface $field_definition, array &$views_field, $field_column_name) {
     $views_field['field']['id'] = 'commerce_reports_report_date_field';
+    $views_field['sort']['id'] = 'commerce_reports_date';
   }
 
   /**
@@ -37,6 +38,7 @@ class OrderReportViewsData extends CommerceEntityViewsData {
    */
   protected function processViewsDataForChanged($table, FieldDefinitionInterface $field_definition, array &$views_field, $field_column_name) {
     $views_field['field']['id'] = 'commerce_reports_report_date_field';
+    $views_field['sort']['id'] = 'commerce_reports_date';
   }
 
 }
