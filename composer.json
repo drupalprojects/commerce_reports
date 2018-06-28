@@ -5,6 +5,6 @@
   "homepage": "http://drupal.org/project/commerce_reports",
   "license": "GPL-2.0+",
   "require": {
-    "drupal/commerce": "^2.6"
+    "drupal/commerce": "^2.7"
   }
 }
